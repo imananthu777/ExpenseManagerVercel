@@ -67,31 +67,32 @@
         }
         .transaction-list {
             margin-top: 30px;
-            overflow-x: auto;
             max-width: 100%;
+            padding: 15px;
+        }
+        .transaction-card {
+            background: white;
             border: 1px solid #eee;
             border-radius: 8px;
             padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .transaction-list table {
-            min-width: 800px;
+        .transaction-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .transaction-details {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
             margin-top: 10px;
         }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
+        .transaction-label {
             font-weight: 600;
+            color: #666;
         }
-        tr:hover {
-            background-color: #f5f5f5;
+        .transaction-value {
+            color: #333;
         }
         .summary {
             background: #f9f9f9;
@@ -168,22 +169,23 @@
 
         <div class="transaction-list">
             <h2>Recent Transactions</h2>
-            <table>
-                <tr>
-                    <th>Type</th>
-                    <th>Description</th>
-                    <th>Amount</th>
-                    <th>Date</th>
-                </tr>
-                {% for transaction in transactions %}
-                <tr>
-                    <td>{{ transaction.type }}</td>
-                    <td>{{ transaction.description }}</td>
-                    <td>₹{{ "%.2f"|format(transaction.amount) }}</td>
-                    <td>{{ transaction.date }}</td>
-                </tr>
-                {% endfor %}
-            </table>
+            {% for transaction in transactions %}
+            <div class="transaction-card">
+                <div class="transaction-details">
+                    <span class="transaction-label">Type:</span>
+                    <span class="transaction-value">{{ transaction.type }}</span>
+                    
+                    <span class="transaction-label">Description:</span>
+                    <span class="transaction-value">{{ transaction.description }}</span>
+                    
+                    <span class="transaction-label">Amount:</span>
+                    <span class="transaction-value">₹{{ "%.2f"|format(transaction.amount) }}</span>
+                    
+                    <span class="transaction-label">Date:</span>
+                    <span class="transaction-value">{{ transaction.date }}</span>
+                </div>
+            </div>
+            {% endfor %}
         </div>
 
         <div class="summary">
