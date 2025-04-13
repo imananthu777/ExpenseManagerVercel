@@ -6,7 +6,6 @@ from datetime import datetime
 from pytz import timezone
 import pandas as pd
 from io import BytesIO
-import pdfkit
 
 
 app = Flask(__name__)
