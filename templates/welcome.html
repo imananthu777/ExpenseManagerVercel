@@ -21,6 +21,17 @@
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+        .left-panel {
+            grid-column: 1;
+        }
+        .right-panel {
+            grid-column: 2;
+            border-left: 1px solid #eee;
+            padding-left: 30px;
         }
         h1, h2 {
             color: #333;
@@ -144,12 +155,13 @@
 </head>
 <body>
     <div class="container">
-        <div class="header-actions">
-            <h1>Welcome {{ name }}!</h1>
-            <a href="/logout" class="logout-btn">Logout</a>
-        </div>
-        
-        <div class="form-group">
+        <div class="left-panel">
+            <div class="header-actions">
+                <h1>Welcome {{ name }}!</h1>
+                <a href="/logout" class="logout-btn">Logout</a>
+            </div>
+            
+            <div class="form-group">
             <h2>Add Transaction</h2>
             <form method="post" action="/add_transaction">
                 <div class="form-row">
@@ -194,8 +206,10 @@
             <p>Total Expenses: ₹{{ "%.2f"|format(total_expenses) }}</p>
             <p>Balance: ₹{{ "%.2f"|format(total_income - total_expenses) }}</p>
         </div>
-
-        <div id="expenseChart" class="chart"></div>
+        </div>
+        <div class="right-panel">
+            <div id="expenseChart" class="chart"></div>
+        </div>
     </div>
     
     <script>
