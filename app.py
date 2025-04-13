@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 from datetime import datetime
+from waitress import serve
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a random secret key!
@@ -175,4 +176,4 @@ def cancel_last():
     return redirect(url_for('welcome'))
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=5000)  # Use port 5000 for Flask
+    serve(app, host='0.0.0.0', port=5000)
