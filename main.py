@@ -1,45 +1,57 @@
+
 from flask import Flask, render_template, request, redirect, url_for, session
-import random
+import hashlib
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a random secret key!
 
 # Mock database
-users_db = {}
+users_db = {}  # Format: {mobile: {'password': hashed_password, 'name': name, 'email': email}}
 
-def send_otp(phone_number):
-    otp = random.randint(100000, 999999)
-    users_db[phone_number] = otp  # Store OTP in the mock database
-    print(f'Sending OTP {otp} to {phone_number}')  # Simulate sending OTP
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
-        phone_number = request.form['phone_number']
-        send_otp(phone_number)
-        session['phone_number'] = phone_number  # Store phone number in session
-        return redirect(url_for('verify_otp'))
+        mobile = request.form['mobile']
+        password = request.form['password']
+        
+        if mobile in users_db and users_db[mobile]['password'] == hash_password(password):
+            session['logged_in'] = True
+            session['mobile'] = mobile
+            return redirect(url_for('welcome'))
+        
+        return "Invalid mobile number or password. Please try again."
 
     return render_template('login.html')
 
-@app.route('/verify', methods=['GET', 'POST'])
-def verify_otp():
+@app.route('/register', methods=['GET', 'POST'])
+def register():
     if request.method == 'POST':
-        phone_number = session.get('phone_number')
-        otp = request.form['otp']
-
-        if phone_number in users_db and users_db[phone_number] == int(otp):
-            session['logged_in'] = True
-            return redirect(url_for('welcome'))
-
-        return "OTP Verification Failed. Please try again."
-
-    return render_template('verify.html')
+        name = request.form['name']
+        mobile = request.form['mobile']
+        password = request.form['password']
+        email = request.form.get('email', '')  # Optional email
+        
+        if mobile in users_db:
+            return "Mobile number already registered!"
+        
+        users_db[mobile] = {
+            'password': hash_password(password),
+            'name': name,
+            'email': email
+        }
+        return redirect(url_for('home'))
+        
+    return render_template('register.html')
 
 @app.route('/welcome')
 def welcome():
     if session.get('logged_in'):
-        return "Welcome! You are logged in."
+        mobile = session.get('mobile')
+        user = users_db.get(mobile, {})
+        return f"Welcome {user.get('name')}! You are logged in."
     return redirect(url_for('home'))
 
 if __name__ == "__main__":

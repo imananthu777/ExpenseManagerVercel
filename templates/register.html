@@ -4,11 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Register</title>
 </head>
 <body>
-    <h1>Login</h1>
+    <h1>Register New User</h1>
     <form method="post">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
         <div>
             <label for="mobile">Mobile Number:</label>
             <input type="text" id="mobile" name="mobile" required>
@@ -17,8 +21,12 @@
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
         </div>
-        <button type="submit">Login</button>
+        <div>
+            <label for="email">Email (optional):</label>
+            <input type="email" id="email" name="email">
+        </div>
+        <button type="submit">Register</button>
     </form>
-    <p>New user? <a href="/register">Register here</a></p>
+    <p>Already have an account? <a href="/">Login here</a></p>
 </body>
 </html>
