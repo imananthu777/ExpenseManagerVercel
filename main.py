@@ -110,6 +110,11 @@ def welcome():
                          total_expenses=total_expenses,
                          chart_data=chart_data)
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
+
 @app.route('/add_transaction', methods=['POST'])
 def add_transaction():
     if not session.get('logged_in'):
