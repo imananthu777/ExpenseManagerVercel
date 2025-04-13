@@ -6,12 +6,28 @@ from datetime import datetime
 from pytz import timezone
 import pandas as pd
 from io import BytesIO
-
+from cryptography.fernet import Fernet
+import base64
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this in production!
 
 USERS_FILE = 'users.json'
+
+# Generate encryption key from secret (store securely in prod)
+SECRET_ENCRYPTION_KEY = base64.urlsafe_b64encode(hashlib.sha256(b"your_super_secret_key").digest())
+fernet = Fernet(SECRET_ENCRYPTION_KEY)
+
+def encrypt_data(data):
+    json_data = json.dumps(data).encode()
+    return fernet.encrypt(json_data).decode()
+
+def decrypt_data(encrypted_data):
+    try:
+        decrypted = fernet.decrypt(encrypted_data.encode())
+        return json.loads(decrypted)
+    except Exception:
+        return []
 
 def load_users():
     if os.path.exists(USERS_FILE):
@@ -32,13 +48,15 @@ def encrypt_mobile(mobile):
 def load_transactions(mobile):
     try:
         with open(f'transactions_{mobile}.json', 'r') as f:
-            return json.load(f)
+            encrypted_data = f.read()
+            return decrypt_data(encrypted_data)
     except FileNotFoundError:
         return []
 
 def save_transactions(mobile, transactions):
+    encrypted_data = encrypt_data(transactions)
     with open(f'transactions_{mobile}.json', 'w') as f:
-        json.dump(transactions, f)
+        f.write(encrypted_data)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -95,7 +113,6 @@ def welcome():
     total_income = sum(t['amount'] for t in transactions if t['type'] == 'income')
     total_expenses = sum(t['amount'] for t in transactions if t['type'] == 'expense')
 
-    # Prepare chart data
     expense_categories = {}
     for t in transactions:
         if t['type'] == 'expense':
@@ -135,19 +152,6 @@ def add_transaction():
 
     return redirect(url_for('welcome'))
 
-@app.route('/reset_all')
-def reset_all():
-    if not session.get('logged_in'):
-        return redirect(url_for('home'))
-
-    encrypted_mobile = session.get('mobile')
-    
-    # Reset transactions to empty
-    save_transactions(encrypted_mobile, [])
-    
-    return redirect(url_for('welcome'))
-
-
 @app.route('/cancel_last')
 def cancel_last():
     if not session.get('logged_in'):
@@ -159,6 +163,16 @@ def cancel_last():
     if transactions:
         transactions.pop()
         save_transactions(encrypted_mobile, transactions)
+
+    return redirect(url_for('welcome'))
+
+@app.route('/reset_all')
+def reset_all():
+    if not session.get('logged_in'):
+        return redirect(url_for('home'))
+
+    encrypted_mobile = session.get('mobile')
+    save_transactions(encrypted_mobile, [])
 
     return redirect(url_for('welcome'))
 
