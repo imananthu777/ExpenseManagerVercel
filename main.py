@@ -152,7 +152,7 @@ def add_transaction():
         'type': request.form['type'],
         'description': request.form['description'],
         'amount': float(request.form['amount']),
-        'date': datetime.now().strftime('%Y-%m-%d %H:%M')
+        'date': datetime.now().strftime('%dth %B %Y %I:%M %p') + ' IST'
     }
     
     transactions = load_transactions(encrypted_mobile)
