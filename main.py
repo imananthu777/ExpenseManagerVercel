@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import hashlib
 import json
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a random secret key!
@@ -66,14 +67,68 @@ def register():
 
     return render_template('register.html')
 
+def load_transactions(mobile):
+    try:
+        with open(f'transactions_{mobile}.json', 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+def save_transactions(mobile, transactions):
+    with open(f'transactions_{mobile}.json', 'w') as f:
+        json.dump(transactions, f)
+
 @app.route('/welcome')
 def welcome():
-    if session.get('logged_in'):
-        encrypted_mobile = session.get('mobile')
-        users = load_users()
-        user = users.get(encrypted_mobile, {})
-        return f"Welcome {user.get('name')}! You are logged in."
-    return redirect(url_for('home'))
+    if not session.get('logged_in'):
+        return redirect(url_for('home'))
+        
+    encrypted_mobile = session.get('mobile')
+    users = load_users()
+    user = users.get(encrypted_mobile, {})
+    
+    transactions = load_transactions(encrypted_mobile)
+    
+    total_income = sum(t['amount'] for t in transactions if t['type'] == 'income')
+    total_expenses = sum(t['amount'] for t in transactions if t['type'] == 'expense')
+    
+    # Prepare chart data
+    expense_categories = {}
+    for t in transactions:
+        if t['type'] == 'expense':
+            expense_categories[t['description']] = expense_categories.get(t['description'], 0) + t['amount']
+    
+    chart_data = {
+        'labels': list(expense_categories.keys()),
+        'values': list(expense_categories.values())
+    }
+    
+    return render_template('welcome.html',
+                         name=user.get('name'),
+                         transactions=transactions,
+                         total_income=total_income,
+                         total_expenses=total_expenses,
+                         chart_data=chart_data)
+
+@app.route('/add_transaction', methods=['POST'])
+def add_transaction():
+    if not session.get('logged_in'):
+        return redirect(url_for('home'))
+        
+    encrypted_mobile = session.get('mobile')
+    
+    transaction = {
+        'type': request.form['type'],
+        'description': request.form['description'],
+        'amount': float(request.form['amount']),
+        'date': datetime.now().strftime('%Y-%m-%d %H:%M')
+    }
+    
+    transactions = load_transactions(encrypted_mobile)
+    transactions.append(transaction)
+    save_transactions(encrypted_mobile, transactions)
+    
+    return redirect(url_for('welcome'))
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)

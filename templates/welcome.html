@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - Expense Tracker</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .transaction-list { margin-top: 20px; }
+        .chart { margin-top: 20px; height: 400px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome {{ name }}!</h1>
+        
+        <div class="form-group">
+            <h2>Add Transaction</h2>
+            <form method="post" action="/add_transaction">
+                <select name="type" required>
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                </select>
+                <input type="text" name="description" placeholder="Description" required>
+                <input type="number" name="amount" placeholder="Amount" step="0.01" required>
+                <button type="submit">Add</button>
+            </form>
+        </div>
+
+        <div class="transaction-list">
+            <h2>Recent Transactions</h2>
+            <table border="1">
+                <tr>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+                {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction.type }}</td>
+                    <td>{{ transaction.description }}</td>
+                    <td>${{ "%.2f"|format(transaction.amount) }}</td>
+                    <td>{{ transaction.date }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="summary">
+            <h2>Summary</h2>
+            <p>Total Income: ${{ "%.2f"|format(total_income) }}</p>
+            <p>Total Expenses: ${{ "%.2f"|format(total_expenses) }}</p>
+            <p>Balance: ${{ "%.2f"|format(total_income - total_expenses) }}</p>
+        </div>
+
+        <div id="expenseChart" class="chart"></div>
+    </div>
+    
+    <script>
+        const data = {{ chart_data|tojson }};
+        Plotly.newPlot('expenseChart', [{
+            values: data.values,
+            labels: data.labels,
+            type: 'pie'
+        }], {
+            title: 'Expense Distribution'
+        });
+    </script>
+</body>
+</html>
