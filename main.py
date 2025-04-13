@@ -161,5 +161,19 @@ def add_transaction():
     
     return redirect(url_for('welcome'))
 
+@app.route('/cancel_last')
+def cancel_last():
+    if not session.get('logged_in'):
+        return redirect(url_for('home'))
+        
+    encrypted_mobile = session.get('mobile')
+    transactions = load_transactions(encrypted_mobile)
+    
+    if transactions:
+        transactions.pop()  # Remove the last transaction
+        save_transactions(encrypted_mobile, transactions)
+    
+    return redirect(url_for('welcome'))
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
