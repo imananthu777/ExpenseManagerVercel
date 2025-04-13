@@ -35,7 +35,7 @@ def home():
         encrypted_mobile = encrypt_mobile(mobile)
         if encrypted_mobile in users and users[encrypted_mobile]['password'] == hash_string(password):
             session['logged_in'] = True
-            session['mobile'] = encrypted_mobile #Store encrypted mobile in session
+            session['mobile'] = encrypted_mobile # Store encrypted mobile in session
             return redirect(url_for('welcome'))
 
         error = "Invalid mobile number or password. Please try again."
@@ -175,7 +175,4 @@ def cancel_last():
     return redirect(url_for('welcome'))
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=8501)  # Change to port 8501
-
-
-    
+    app.run(debug=False, host='0.0.0.0', port=5000)  # Use port 5000 for Flask
