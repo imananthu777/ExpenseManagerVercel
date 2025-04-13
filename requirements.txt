@@ -2,3 +2,4 @@ Flask
 pytz
 pandas
 cryptography
+openpyxl
