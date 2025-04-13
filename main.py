@@ -1,5 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, make_response
-import pdfkit
+from flask import Flask, render_template, request, redirect, url_for, session
 import hashlib
 import json
 import os
@@ -110,31 +109,6 @@ def welcome():
                          total_income=total_income,
                          total_expenses=total_expenses,
                          chart_data=chart_data)
-
-@app.route('/export_pdf')
-def export_pdf():
-    if not session.get('logged_in'):
-        return redirect(url_for('home'))
-        
-    encrypted_mobile = session.get('mobile')
-    users = load_users()
-    user = users.get(encrypted_mobile, {})
-    
-    transactions = load_transactions(encrypted_mobile)
-    total_income = sum(t['amount'] for t in transactions if t['type'] == 'income')
-    total_expenses = sum(t['amount'] for t in transactions if t['type'] == 'expense')
-    
-    html = render_template('pdf_template.html',
-                         name=user.get('name'),
-                         transactions=transactions,
-                         total_income=total_income,
-                         total_expenses=total_expenses)
-    
-    pdf = pdfkit.from_string(html, False)
-    response = make_response(pdf)
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'attachment; filename=transactions.pdf'
-    return response
 
 @app.route('/logout')
 def logout():
