@@ -44,7 +44,7 @@
                 <tr>
                     <td>{{ transaction.type }}</td>
                     <td>{{ transaction.description }}</td>
-                    <td>${{ "%.2f"|format(transaction.amount) }}</td>
+                    <td>₹{{ "%.2f"|format(transaction.amount) }}</td>
                     <td>{{ transaction.date }}</td>
                 </tr>
                 {% endfor %}
@@ -53,9 +53,9 @@
 
         <div class="summary">
             <h2>Summary</h2>
-            <p>Total Income: ${{ "%.2f"|format(total_income) }}</p>
-            <p>Total Expenses: ${{ "%.2f"|format(total_expenses) }}</p>
-            <p>Balance: ${{ "%.2f"|format(total_income - total_expenses) }}</p>
+            <p>Total Income: ₹{{ "%.2f"|format(total_income) }}</p>
+            <p>Total Expenses: ₹{{ "%.2f"|format(total_expenses) }}</p>
+            <p>Balance: ₹{{ "%.2f"|format(total_income - total_expenses) }}</p>
         </div>
 
         <div id="expenseChart" class="chart"></div>
