@@ -174,5 +174,8 @@ def cancel_last():
     
     return redirect(url_for('welcome'))
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+if __name__ == '__main__':
+    app.run(debug=False, host='0.0.0.0', port=8501)  # Change to port 8501
+
+
+    
