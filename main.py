@@ -9,8 +9,10 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a random secret key!
 
 def get_db_connection():
-    conn = psycopg2.connect(os.environ['DATABASE_URL'])
-    return conn
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url:
+        raise Exception("DATABASE_URL environment variable is not set. Please set it in the Secrets tab.")
+    return psycopg2.connect(database_url)
 
 # Create users table if it doesn't exist
 def init_db():
