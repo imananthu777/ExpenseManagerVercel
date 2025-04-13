@@ -22,9 +22,10 @@ def home():
             session['mobile'] = mobile
             return redirect(url_for('welcome'))
         
-        return "Invalid mobile number or password. Please try again."
+        error = "Invalid mobile number or password. Please try again."
+        return render_template('login.html', error=error)
 
-    return render_template('login.html')
+    return render_template('login.html', error=None)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
